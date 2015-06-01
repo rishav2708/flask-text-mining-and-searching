@@ -1,0 +1,64 @@
+<html>
+	<head>
+	</head>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script>
+	navigator.geolocation.getCurrentPosition(callback);
+		
+		/*function showlocation() {
+   // One-shot position request.
+   
+   //alert("Hi");
+}*/
+ 
+function callback(position) {
+   document.getElementById('latitude').value = position.coords.latitude;
+   //alert(position.coords.latitude);
+   document.getElementById('longitude').value = position.coords.longitude;
+}
+$(document).ready(function(){
+    $("#srcbtn").click(function(){
+		$.ajax({
+			url:"/dispResults",
+			data:{query:$("#search").val()},
+			dataType:"json",
+			success:function(resp,status,xhr)
+					{
+					   
+					    str="<h1>Based on your query... we find out...</h1>"
+					    for(i=0;i<resp.length;i++)
+					    {
+							str+="Index: "+resp[i][0]+"&nbsp;Score: "+resp[i][1]+"&nbsp;<br>";
+							str+="<h2>Machine would suggest some places belonging to this categiry</h2>";
+							for(j=0;j<resp[i][2].length;j++)
+						    {
+							   str+="<button id='fetch'>"+resp[i][2][j]+"</button>";
+							}
+							str+="</br>";
+							
+						}
+						$("#fetch").click(function(){
+						  $.ajax({
+    	url:'/geoData',
+    	data:{lat:$("#latitude").val(),lon:$("#longitude").val(),place:obj.innerHTML},
+    	success:function(resp,status,xhr){
+    	           alert(resp);
+    	        }
+    	});
+						});
+						$("#results").html(str);
+						//alert(resp);
+						
+					}
+			});
+		});
+		});
+	</script>
+	<body>
+		<input type=text name=lat id="latitude" />
+		<input type=text name=lon  id="longitude"/>
+		<input type=text name="search" id="search" />
+		<button id="srcbtn">Search</button>
+		<div id="results"></div>
+	</body>
+</html>

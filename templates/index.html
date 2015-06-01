@@ -1,0 +1,81 @@
+<html>
+	<head>
+	</head>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script>
+	navigator.geolocation.getCurrentPosition(callback);
+		
+		/*function showlocation() {
+   // One-shot position request.
+   
+   //alert("Hi");
+}*/
+function showResults(obj)
+{
+	lati=$("#latitude").val();
+	longi=$("#longitude").val()
+	p=(obj.innerHTML),toString();
+	$(document).ready(function(){
+		$.ajax({
+			url: "/geoData",
+			data:{lat:lati,lon:longi,place:p},
+			dataType:"json",
+			success:function(resp,status,xhr)
+			    {
+					 l=resp['data'];
+					 str="<table border=1>"
+					 for(i=0;i<l.length;i++)
+					 {
+						 str+="<tr><td>"+l[i][0]+"</td></tr>"
+					 }
+					 str+="</table";
+					 $("#suggestions").html(str);
+			    }
+			});
+		});
+}
+ 
+function callback(position) {
+   document.getElementById('latitude').value = position.coords.latitude;
+   //alert(position.coords.latitude);
+   document.getElementById('longitude').value = position.coords.longitude;
+}
+$(document).ready(function(){
+    $("#srcbtn").click(function(){
+		$.ajax({
+			url:"/dispResults",
+			data:{query:$("#search").val()},
+			dataType:"json",
+			success:function(resp,status,xhr)
+					{
+					   
+					    str="<h1>Based on your query... we find out...</h1>"
+					    
+					    
+							str+="Index: "+resp[0][0]+"&nbsp;Score: "+resp[0][1]+"&nbsp;<br>";
+							str+="<h2>Machine would suggest some places belonging to this category</h2>";
+							for(j=0;j<resp[0][2].length;j++)
+						    {
+							   str+="<button id='fetch' onclick='showResults(this)'>"+resp[0][2][j]+"</button>";
+							}
+							str+="</br>";
+							
+						
+						
+						$("#results").html(str);
+						//alert(resp);
+						
+					}
+			});
+		});
+		});
+	</script>
+	<body>
+		<input type=text name=lat id="latitude" />
+		<input type=text name=lon  id="longitude"/>
+		<input type=text name="search" id="search" />
+		<button id="srcbtn">Search</button>
+		<div id="results"></div>
+		<div id="suggestions"></div>
+	</body>
+</html>
